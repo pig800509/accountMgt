@@ -2,7 +2,7 @@ var Router = require('koa-router');
 const router = module.exports = new Router();
 
 const Account = require('../service/AccountMgtService');
-
+/*
 router.get('/', async (ctx, next) => {
 	console.log('get devices');
 	ctx.body = await Account.listAccount();
@@ -20,10 +20,10 @@ router.get('/byRole/:role_id', async (ctx, next) => {
 	console.log('role_id:', ctx.params.role_id);
 	ctx.body = await Account.findAccountByRole(ctx.params.role_id);
 });
-
+*/
 router.post('/', async (ctx, next) => {
-	console.log('post account');
-	console.log('post data:', ctx.request.body);
+	//console.log('post account');
+	//console.log('post data:', ctx.request.body);
 	try{
 		ctx.body = await Account.createAccount(ctx);
 		//ctx.body = await Account.createAccount(ctx);
@@ -32,7 +32,7 @@ router.post('/', async (ctx, next) => {
 		ctx.body = e;
 	}
 });
-
+/*
 router.put('/:user_id', async (ctx, next) => {
     console.log('put account');
     console.log('user_id:', ctx.params.user_id);
@@ -45,7 +45,7 @@ router.put('/:user_id', async (ctx, next) => {
 		ctx.body = e;
 	}
 });
-/*
+
 router.delete('/:device_id', async (ctx, next) => {
 	console.log('delete device');
 	console.log('device_id:', ctx.params.device_id);

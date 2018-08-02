@@ -1,4 +1,4 @@
-exports.checkbody = function (require, body) {
+module.exports = function (require, body) {
     let fail = {
         "status": false
     };

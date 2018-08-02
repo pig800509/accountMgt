@@ -1,25 +1,24 @@
 const Koa = require('koa');
-const static = require('koa-static');
+const serve  = require('koa-static');
 //const bodyParser = require('koa-bodyparser');
 const bodyParser = require('koa-body');
-const app = new Koa();
+const convert = require('koa-convert');
 const router = require('./routes');
-const path = require('path')
+const path = require('path');
+const { uploadFile } = require('./utils/upload');
+const app = new Koa();
 
-const staticPath = './public' 
-app.use(static(
-    path.join( __dirname,  staticPath)
-  ));
-//app.use(serve('./public'));
+app.use(convert(serve('./public')));
+
 app.use(bodyParser({
     multipart: true,
     urlencoded: true
 }));
 
-//display some process info in console log
-app.use((ctx, next) => {
+app.use(async(ctx, next) => {
     ctx.set("Access-Control-Allow-Origin", "*");
     ctx.set("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, POST, DELETE");
+    
     if (ctx.request.method == "OPTIONS") {
         ctx.response.status = 200
     }
@@ -30,8 +29,8 @@ app.use((ctx, next) => {
     });
 });
 
-app.use(router.routes());
+//app.use(router.routes());
 
-app.listen(3001, () => {
-    console.log('Listening on port ' + 3001 + '.')
+app.listen(3000, () => {
+    console.log('Listening on port ' + 3000 + '.')
 });

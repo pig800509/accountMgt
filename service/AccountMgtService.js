@@ -1,51 +1,15 @@
 'use strict';
 
 const moment = require('moment');
-//const _ = require('lodash');
-//const randomString = require('randomstring');
-const uuid = require('uuid');
+const fileSystem = require('file-system');
+const path = require('path');
+//const uuid = require('uuid');
 const AccountInfo = require('../model/AccountInfo');
 //const RoleInfo = require('../model/RoleInfo');
-const {
-    checkbody
-} = require('../utils/checkbody');
-const path = require('path')
-const {
-    uploadFile
-} = require('../utils/upload')
-
-const responseErrMsg = (errCode, errString) => {
-
-    var errMsg = {
-        results: {
-            status: 'Fail',
-            status_code: '',
-            status_msg: ''
-        }
-    };
-
-    errMsg.results.status_msg = errString;
-    errMsg.results.status_code = errCode.toString();
-
-    return errMsg;
-}
-
-const uploadImage = async (ctx) => {
-    if (ctx.request.body.files.photo) {
-        let serverFilePath = path.join(__dirname, '../public/image');
-        console.log(serverFilePath);
-        let result = await uploadFile(ctx, {
-            path: serverFilePath
-        });
-        return {
-            "photo_filename": result.data.fileName,
-            "photo_url": result.data.pictureUrl,
-            "photo_preview_url": result.data.pictureUrl
-        };
-    } else {
-        return {};
-    }
-}
+//const responseError = require('./ResponseError');
+const IDGen = require('../utils/IDGenerator');
+const checkbody = require('../utils/CheckBody');
+const { responseError } = require('../utils/Response');
 
 exports.listAccount = async () => {
     try {
@@ -54,7 +18,7 @@ exports.listAccount = async () => {
             "__v": 0
         }).lean().exec();
     } catch (e) {
-        return responseErrMsg(502, e);
+        return responseError(502, e);
     }
 }
 
@@ -64,7 +28,7 @@ exports.findAccountByRole = async (role_id) => {
             "role_id": role_id
         }).lean().exec();
     } catch (e) {
-        return responseErrMsg(502, e);
+        return responseError(502, e);
     }
 }
 
@@ -78,22 +42,20 @@ exports.findOneAccount = async (user_id) => {
             "__v": 0
         }).lean().exec();
     } catch (e) {
-        return responseErrMsg(502, e);
+        return responseError(502, e);
     }
 }
 
 exports.createAccount = async (ctx) => {
     const body = ctx.request.body.fields;
-    //console.log(body);
-    /*
     const require_params = ["username", "password", "email", "phone", "role_id"];
     
     const checkrequest = checkbody(require_params, body);
     if (!checkrequest.status)
-        return responseErrMsg(502, checkrequest.status_msg);
-    */
+        return responseError(502, checkrequest.status_msg);
+    
     var newitem = {
-        "user_id": uuid.v1(),
+        "user_id": IDGen.genIdInUUIDForm(),
         "username": body.username,
         "first_name": body.first_name,
         "last_name": body.last_name,
@@ -105,20 +67,28 @@ exports.createAccount = async (ctx) => {
         "role_id": body.role_id,
         "active_status": 1
     };
-
+    
     try {
+        //let filename = IDGen.genIdInDatetimeForm();
+        let body = ctx.request.body;
+        let dirPath = path.join(__dirname, '../public/thumbnail');
+        let fullfilename = body.fields.photo_filename + '.' + body.files.photo.name.split('.').pop();
+        fileSystem.mkdirSync(dirPath);
+        let file = body.files.photo;
+        if(file){
+            let reader = fileSystem.createReadStream(file.path);
+            let stream = fileSystem.createWriteStream(path.join(dirPath, fullfilename));
+            reader.pipe(stream);
+            console.log("photo uploading...");
+            let photo_url = `/public/thumbnail/${fullfilename}`;
+            newitem.photo_filename= body.fields.photo_filename;
+            newitem.photo_url= photo_url;
+            newitem.photo_preview_url=ctx.host + photo_url;
+        }
         return await AccountInfo.create(newitem);
-        //console.log(await uploadImage(ctx));
-
-        //let photo_field = await uploadImage(ctx);
-        //let result = await AccountInfo.create(newitem);
-        
-        //return Object.assign(result, photo_field);
-
     } catch (e) {
-        return responseErrMsg(502, e);
+        return responseError(502, e);
     }
-
 }
 
 exports.updateAccount = async (ctx) => {
@@ -136,7 +106,7 @@ exports.updateAccount = async (ctx) => {
             }
         });
     } catch (e) {
-        return responseErrMsg(502, e);
+        return responseError(502, e);
     }
 }
 
@@ -146,6 +116,6 @@ exports.removeOneAccount = async (user_id) => {
             "user_id": user_id
         }).exec();
     } catch (e) {
-        return responseErrMsg(502, e);
+        return responseError(502, e);
     }
 }
