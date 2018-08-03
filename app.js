@@ -4,8 +4,7 @@ const serve  = require('koa-static');
 const bodyParser = require('koa-body');
 const convert = require('koa-convert');
 const router = require('./routes');
-const path = require('path');
-const { uploadFile } = require('./utils/upload');
+
 const app = new Koa();
 
 app.use(convert(serve('./public')));
@@ -29,7 +28,7 @@ app.use(async(ctx, next) => {
     });
 });
 
-//app.use(router.routes());
+app.use(router.routes());
 
 app.listen(3000, () => {
     console.log('Listening on port ' + 3000 + '.')

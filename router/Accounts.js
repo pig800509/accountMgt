@@ -2,9 +2,10 @@ var Router = require('koa-router');
 const router = module.exports = new Router();
 
 const Account = require('../service/AccountMgtService');
-/*
+const { response } = require('../utils/Response');
+
 router.get('/', async (ctx, next) => {
-	console.log('get devices');
+	console.log('get accounts');
 	ctx.body = await Account.listAccount();
 });
 
@@ -20,19 +21,14 @@ router.get('/byRole/:role_id', async (ctx, next) => {
 	console.log('role_id:', ctx.params.role_id);
 	ctx.body = await Account.findAccountByRole(ctx.params.role_id);
 });
-*/
+
 router.post('/', async (ctx, next) => {
-	//console.log('post account');
-	//console.log('post data:', ctx.request.body);
-	try{
-		ctx.body = await Account.createAccount(ctx);
-		//ctx.body = await Account.createAccount(ctx);
-	}
-	catch(e){
-		ctx.body = e;
-	}
+	console.log('post account');
+	console.log('post data:', ctx.request.body);
+	let resData = await Account.createAccount(ctx);
+	response(ctx, resData);
 });
-/*
+
 router.put('/:user_id', async (ctx, next) => {
     console.log('put account');
     console.log('user_id:', ctx.params.user_id);
@@ -46,15 +42,8 @@ router.put('/:user_id', async (ctx, next) => {
 	}
 });
 
-router.delete('/:device_id', async (ctx, next) => {
-	console.log('delete device');
-	console.log('device_id:', ctx.params.device_id);
-	ctx.body = await Device.removeOneDevice(ctx.params.device_id);
+router.delete('/:user_id', async (ctx, next) => {
+	console.log('delete account');
+	console.log('user_id:', ctx.params.user_id);
+	ctx.body = await Account.removeOneAccount(ctx.params.user_id);
 });
-
-router.put('/unregister/:device_id', async (ctx, next) => {
-    console.log('unregister device');
-	console.log('device_id:', ctx.params.device_id);
-	ctx.body = await Device.unregisterDevice(ctx.params.device_id);
-})
-*/

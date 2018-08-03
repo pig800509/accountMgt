@@ -1,15 +1,18 @@
 'use strict';
 
-const moment = require('moment');
-const fileSystem = require('file-system');
-const path = require('path');
+//const moment = require('moment');
+//const fileSystem = require('file-system');
+//const path = require('path');
 //const uuid = require('uuid');
 const AccountInfo = require('../model/AccountInfo');
 //const RoleInfo = require('../model/RoleInfo');
 //const responseError = require('./ResponseError');
 const IDGen = require('../utils/IDGenerator');
 const checkbody = require('../utils/CheckBody');
-const { responseError } = require('../utils/Response');
+const uploadImage = require('../utils/Upload');
+const {
+    responseError
+} = require('../utils/Response');
 
 exports.listAccount = async () => {
     try {
@@ -49,11 +52,11 @@ exports.findOneAccount = async (user_id) => {
 exports.createAccount = async (ctx) => {
     const body = ctx.request.body.fields;
     const require_params = ["username", "password", "email", "phone", "role_id"];
-    
+
     const checkrequest = checkbody(require_params, body);
     if (!checkrequest.status)
         return responseError(502, checkrequest.status_msg);
-    
+
     var newitem = {
         "user_id": IDGen.genIdInUUIDForm(),
         "username": body.username,
@@ -67,24 +70,13 @@ exports.createAccount = async (ctx) => {
         "role_id": body.role_id,
         "active_status": 1
     };
-    
+
     try {
-        //let filename = IDGen.genIdInDatetimeForm();
-        let body = ctx.request.body;
-        let dirPath = path.join(__dirname, '../public/thumbnail');
-        let fullfilename = body.fields.photo_filename + '.' + body.files.photo.name.split('.').pop();
-        fileSystem.mkdirSync(dirPath);
-        let file = body.files.photo;
-        if(file){
-            let reader = fileSystem.createReadStream(file.path);
-            let stream = fileSystem.createWriteStream(path.join(dirPath, fullfilename));
-            reader.pipe(stream);
-            console.log("photo uploading...");
-            let photo_url = `/public/thumbnail/${fullfilename}`;
-            newitem.photo_filename= body.fields.photo_filename;
-            newitem.photo_url= photo_url;
-            newitem.photo_preview_url=ctx.host + photo_url;
+        if (ctx.request.body.files.photo) {
+            let photoInfo = uploadImage(ctx);
+            Object.assign(newitem, photoInfo);
         }
+
         return await AccountInfo.create(newitem);
     } catch (e) {
         return responseError(502, e);
@@ -93,9 +85,14 @@ exports.createAccount = async (ctx) => {
 
 exports.updateAccount = async (ctx) => {
     console.log('update');
-    const body = ctx.request.body;
+    const body = ctx.request.body.fields;
     const user_id = ctx.params.user_id
+
     try {
+        if (ctx.request.body.files.photo) {
+            let photoInfo = uploadImage(ctx);
+            Object.assign(body, photoInfo);
+        }
         return await AccountInfo.findOneAndUpdate({
             "user_id": user_id
         }, body, {
