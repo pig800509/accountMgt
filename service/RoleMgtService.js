@@ -1,5 +1,4 @@
 'use strict';
-
 const moment = require('moment');
 const RoleInfo = require('../model/RoleInfo');
 const IDGen = require('../utils/IDGenerator');

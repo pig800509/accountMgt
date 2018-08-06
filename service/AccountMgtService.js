@@ -1,5 +1,4 @@
 'use strict';
-
 const moment = require('moment');
 const AccountInfo = require('../model/AccountInfo');
 const {
