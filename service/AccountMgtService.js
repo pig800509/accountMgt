@@ -1,6 +1,6 @@
 'use strict';
 
-//const moment = require('moment');
+const moment = require('moment');
 //const fileSystem = require('file-system');
 //const path = require('path');
 //const uuid = require('uuid');
@@ -9,8 +9,9 @@ const AccountInfo = require('../model/AccountInfo');
 //const responseError = require('./ResponseError');
 const IDGen = require('../utils/IDGenerator');
 const checkbody = require('../utils/CheckBody');
-const uploadImage = require('../utils/Upload');
+const uploadImage = require('../utils/UploadFile');
 const {
+    responseSuccess,
     responseError
 } = require('../utils/Response');
 
@@ -72,12 +73,12 @@ exports.createAccount = async (ctx) => {
     };
 
     try {
+        let photoInfo = null;
         if (ctx.request.body.files.photo) {
-            let photoInfo = uploadImage(ctx);
-            Object.assign(newitem, photoInfo);
+            photoInfo = await uploadImage(ctx);
         }
-
-        return await AccountInfo.create(newitem);
+        await AccountInfo.create(newitem);
+        return responseSuccess("Create success.", newitem);
     } catch (e) {
         return responseError(502, e);
     }
@@ -89,11 +90,12 @@ exports.updateAccount = async (ctx) => {
     const user_id = ctx.params.user_id
 
     try {
+        let photoInfo = null;
         if (ctx.request.body.files.photo) {
-            let photoInfo = uploadImage(ctx);
-            Object.assign(body, photoInfo);
+            photoInfo = await uploadImage(ctx);
+            //Object.assign(body, photoInfo);
         }
-        return await AccountInfo.findOneAndUpdate({
+        let result = await AccountInfo.findOneAndUpdate({
             "user_id": user_id
         }, body, {
             new: true,
@@ -102,6 +104,7 @@ exports.updateAccount = async (ctx) => {
                 "__v": 0
             }
         });
+        return responseSuccess("Update Success.", result._doc);
     } catch (e) {
         return responseError(502, e);
     }
@@ -109,9 +112,11 @@ exports.updateAccount = async (ctx) => {
 
 exports.removeOneAccount = async (user_id) => {
     try {
-        await AccountInfo.deleteOne({
+        let user = {
             "user_id": user_id
-        }).exec();
+        };
+        await AccountInfo.deleteOne(user).exec();
+        return responseSuccess("Delete Success", Object.assign(user, moment().format('YYYY-MM-DD HH:mm:ss')));
     } catch (e) {
         return responseError(502, e);
     }

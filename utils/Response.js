@@ -14,7 +14,7 @@ exports.responseError = function (errCode, errString) {
     var errMsg = {
         results: {
             status: 'Fail',
-            status_code: 200,
+            status_code: 400,
             status_msg: ''
         }
     };
@@ -23,4 +23,19 @@ exports.responseError = function (errCode, errString) {
     errMsg.results.status_code = errCode;
 
     return errMsg;
+}
+
+exports.responseSuccess = function (successString, body) {
+    /* Error message template */
+    var suMsg = {
+        results: {
+            status: 'OK',
+            status_code: 200,
+            status_msg: ''
+        }
+    };
+
+    suMsg.results.status_msg = successString;
+    Object.assign(suMsg.results, body);
+    return suMsg;
 }

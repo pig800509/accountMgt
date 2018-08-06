@@ -5,6 +5,7 @@ module.exports = function (require, body) {
     let success = {
         "status": true
     };
+    console.log(body);
     for (var i = 0; i < require.length; i++) {
         if (!body[require[i]])
             return Object.assign(fail, {

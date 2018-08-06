@@ -18,7 +18,7 @@ router.get('/:role_id', async (ctx, next) => {
 router.post('/', async (ctx, next) => {
 	console.log('post role');
 	console.log('post data:', ctx.request.body);
-	let resData = await Role.createRole(ctx);
+	let resData = await Role.createRole(ctx.request.body);
 	response(ctx, resData);
 });
 
@@ -28,7 +28,7 @@ router.put('/:role_id', async (ctx, next) => {
 	console.log('put data:', ctx.request.body);
 	//ctx.body = await Account.updateDevice(ctx.params.user_id, ctx.request.body);
 	try{
-		ctx.body = await Role.updateRole(ctx);
+		ctx.body = await Role.updateRole(ctx.request.body);
 	}
 	catch(e){
 		ctx.body = e;
