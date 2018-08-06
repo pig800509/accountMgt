@@ -89,8 +89,8 @@ exports.createAccount = async (ctx) => {
         }
         await AccountInfo.create(newitem);
         return responseSuccess("Create success.", {
-            newitem,
-            photoInfo,
+            ...newitem,
+            ...photoInfo,
             "created_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
@@ -120,7 +120,7 @@ exports.updateAccount = async (ctx) => {
             }
         });
         return responseSuccess("Update Success.", { ...result._doc,
-            photoInfo,
+            ...photoInfo,
             "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
@@ -137,7 +137,7 @@ exports.removeOneAccount = async (user_id) => {
         };
         await AccountInfo.deleteOne(user).exec();
         return responseSuccess("Delete Success", {
-            user,
+            ...user,
             "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
