@@ -33,6 +33,9 @@ exports.findAccountByRole = async (role_id) => {
     try {
         let result = await AccountInfo.find({
             "role_id": role_id
+        }, {
+            "_id": 0,
+            "__v": 0
         }).lean().exec();
         return result ? result : responseError(502, "Item not found");
     } catch (e) {
@@ -104,6 +107,9 @@ exports.updateAccount = async (ctx) => {
     console.log('update');
     const body = ctx.request.body.fields;
     const user_id = ctx.params.user_id
+
+    if (body.username)
+        return responseError(502, "Unable change username.");
 
     let photoInfo = null;
     try {
