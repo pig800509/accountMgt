@@ -1,24 +1,22 @@
 'use strict';
 
-//const moment = require('moment');
-//const fileSystem = require('file-system');
-//const path = require('path');
-//const uuid = require('uuid');
-//const AccountInfo = require('../model/AccountInfo');
+const moment = require('moment');
 const RoleInfo = require('../model/RoleInfo');
 const IDGen = require('../utils/IDGenerator');
 const checkbody = require('../utils/CheckBody');
-//const uploadImage = require('../utils/Upload');
 const {
+    responseSuccess,
     responseError
 } = require('../utils/Response');
 
 exports.listRole = async () => {
     try {
-        return await RoleInfo.find({}, {
-            "_id": 0,
-            "__v": 0
-        }).lean().exec();
+        return {
+            "role_list": await RoleInfo.find({}, {
+                "_id": 0,
+                "__v": 0
+            }).lean().exec()
+        };
     } catch (e) {
         return responseError(502, e);
     }
@@ -27,21 +25,22 @@ exports.listRole = async () => {
 exports.findOneRole = async (role_id) => {
     console.log('find one');
     try {
-        return await RoleInfo.findOne({
+        let result = await RoleInfo.findOne({
             role_id: role_id
         }, {
             "_id": 0,
             "__v": 0
         }).lean().exec();
+
+        return result ? result : responseError(502, "Item not found.");
     } catch (e) {
         return responseError(502, e);
     }
 }
 
 exports.createRole = async (body) => {
-    
-    //const body = ctx.request.body.fields;
-    const require_params = ["role_name", "password", "email", "phone", "role_id"];
+
+    const require_params = ["role_name", "permission_settings"];
 
     const checkrequest = checkbody(require_params, body);
     if (!checkrequest.status)
@@ -50,16 +49,19 @@ exports.createRole = async (body) => {
     var newitem = {
         "role_id": IDGen.genIdInUUIDForm(),
         "role_name": body.role_name,
-        "display_name": body.display_name,
-        "description": body.description,
-        "active_status": body.active_status,
-        "used": body.used,
-        "num_of_users": body.num_of_users,
+        "display_name": body.display_name ? body.display_name : null,
+        "description": body.description ? body.description : null,
+        "active_status": body.active_status ? body.active_status : null,
+        "used": body.used ? body.used : 0,
+        "num_of_users": body.num_of_users ? body.num_of_users : 0,
         "permission_settings": body.permission_settings
     };
 
     try {
-        return await RoleInfo.create(newitem);
+        await RoleInfo.create(newitem);
+        return responseSuccess("Create success.", { ...newitem,
+            "created_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+        });
     } catch (e) {
         return responseError(502, e);
     }
@@ -71,7 +73,7 @@ exports.updateRole = async (body) => {
     const role_id = ctx.params.role_id
 
     try {
-        return await RoleInfo.findOneAndUpdate({
+        let result = await RoleInfo.findOneAndUpdate({
             "role_id": role_id
         }, body, {
             new: true,
@@ -80,6 +82,9 @@ exports.updateRole = async (body) => {
                 "__v": 0
             }
         });
+        return responseSuccess("Update Success.", { ...result._doc,
+            "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+        });
     } catch (e) {
         return responseError(502, e);
     }
@@ -87,9 +92,14 @@ exports.updateRole = async (body) => {
 
 exports.removeOneRole = async (role_id) => {
     try {
-        await RoleInfo.deleteOne({
+        let role = {
             "role_id": role_id
-        }).exec();
+        };
+        await RoleInfo.deleteOne(role).exec();
+        return responseSuccess("Delete Success", {
+            ...role,
+            "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+        });
     } catch (e) {
         return responseError(502, e);
     }
