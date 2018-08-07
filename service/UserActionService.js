@@ -26,6 +26,25 @@ exports.login = async (request) => {
         return responseError(502, e);
     }
 }
+
+
+exports.logout = async (user_id) => {
+    
+    try {
+        const auth = await AccountInfo.findOne({
+            "username": body.username
+        });
+        if (body.password === auth.password){
+            
+        }
+        else {
+            
+        }
+            
+    } catch (e) {
+        return responseError(502, e);
+    }
+}
 /*
 exports.findOneAccount = async (user_id) => {
     console.log('find one');

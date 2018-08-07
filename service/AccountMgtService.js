@@ -20,7 +20,8 @@ exports.listAccount = async () => {
         return {
             "account_list": await AccountInfo.find({}, {
                 "_id": 0,
-                "__v": 0
+                "__v": 0,
+                "password": 0
             }).lean().exec()
         };
     } catch (e) {
@@ -34,7 +35,8 @@ exports.findAccountByRole = async (role_id) => {
             "role_id": role_id
         }, {
             "_id": 0,
-            "__v": 0
+            "__v": 0,
+            "password": 0
         }).lean().exec();
         return result ? result : responseError(502, "Item not found");
     } catch (e) {
@@ -49,7 +51,8 @@ exports.findOneAccount = async (user_id) => {
             user_id: user_id
         }, {
             "_id": 0,
-            "__v": 0
+            "__v": 0,
+            "password":0
         }).lean().exec();
         return result ? result : responseError(502, "Item not found");
     } catch (e) {
@@ -89,7 +92,8 @@ exports.createAccount = async (ctx) => {
         if (ctx.request.body.files.photo) {
             photoInfo = await uploadPhoto(ctx);
         }
-        await AccountInfo.create(newitem);
+        await AccountInfo.create({...newitem,...photoInfo});
+        delete newitem.password;
         return responseSuccess("Create success.", {
             ...newitem,
             ...photoInfo,
@@ -117,11 +121,12 @@ exports.updateAccount = async (ctx) => {
         }
         let result = await AccountInfo.findOneAndUpdate({
             "user_id": user_id
-        }, body, {
+        }, {...body,...photoInfo}, {
             new: true,
             fields: {
                 "_id": 0,
-                "__v": 0
+                "__v": 0,
+                "password": 0
             }
         });
         return responseSuccess("Update Success.", { ...result._doc,
@@ -149,3 +154,21 @@ exports.removeOneAccount = async (user_id) => {
         return responseError(502, e);
     }
 }
+/*
+exports.verifyUser = async (request) => {
+    console.log('Verify user');
+    const body = request.fields || request;
+    try {
+        let result = await AccountInfo.findOne({
+            user_id: user_id
+        }, {
+            "_id": 0,
+            "__v": 0,
+            "password":0
+        }).lean().exec();
+        return result ? result : responseError(502, "Item not found");
+    } catch (e) {
+        return responseError(502, e);
+    }
+}
+*/
