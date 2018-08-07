@@ -17,8 +17,8 @@ exports.uploadPhoto = (ctx) => new Promise(
         let stream = fileSystem.createWriteStream(path.join(dirPath, fullfilename));
         reader.pipe(stream);
         //reader.end();
-        stream.end();
-        let photo_url = `/public/thumbnail/${fullfilename}`;
+        //stream.end();
+        let photo_url = `/thumbnail/${fullfilename}`;
         resolve({
             "photo_filename": fullfilename,
             "photo_url": photo_url,

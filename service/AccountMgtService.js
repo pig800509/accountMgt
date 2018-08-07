@@ -61,7 +61,7 @@ exports.findOneAccount = async (user_id) => {
 }
 
 exports.createAccount = async (ctx) => {
-    const body = ctx.request.body.fields;
+    const body = ctx.request.body.fields || ctx.request.body;
     const require_params = ["username", "password", "email", "phone", "role_id"];
 
     const checkrequest = checkbody(require_params, body);
@@ -108,7 +108,7 @@ exports.createAccount = async (ctx) => {
 
 exports.updateAccount = async (ctx) => {
     console.log('update');
-    const body = ctx.request.body.fields;
+    const body = ctx.request.body.fields || ctx.request.body;
     const user_id = ctx.params.user_id
 
     if (body.username)
@@ -154,7 +154,7 @@ exports.removeOneAccount = async (user_id) => {
         return responseError(502, e);
     }
 }
-/*
+
 exports.verifyUser = async (request) => {
     console.log('Verify user');
     const body = request.fields || request;
@@ -171,4 +171,3 @@ exports.verifyUser = async (request) => {
         return responseError(502, e);
     }
 }
-*/
