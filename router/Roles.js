@@ -26,7 +26,6 @@ router.put('/:role_id', async (ctx, next) => {
     console.log('put role');
     console.log('role_id:', ctx.params.role_id);
 	console.log('put data:', ctx.request.body);
-	//ctx.body = await Account.updateDevice(ctx.params.user_id, ctx.request.body);
 	try{
 		ctx.body = await Role.updateRole(ctx.request.body);
 	}
@@ -38,5 +37,5 @@ router.put('/:role_id', async (ctx, next) => {
 router.delete('/:role_id', async (ctx, next) => {
 	console.log('delete role');
 	console.log('role_id:', ctx.params.role_id);
-	ctx.body = await Role.removeOneRole(ctx.params.user_id);
+	ctx.body = await Role.removeOneRole(ctx.params.role_id);
 });
