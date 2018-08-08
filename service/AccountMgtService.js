@@ -92,7 +92,7 @@ exports.createAccount = async (ctx) => {
         if (ctx.request.body.files.photo) {
             photoInfo = await uploadPhoto(ctx);
         }
-        await AccountInfo.create({...newitem,...photoInfo});
+        await AccountInfo.create({...newitem,...photoInfo}).exec();
         delete newitem.password;
         return responseSuccess("Create success.", {
             ...newitem,
@@ -109,7 +109,6 @@ exports.createAccount = async (ctx) => {
 exports.updateAccount = async (ctx) => {
     console.log('update');
     const body = ctx.request.body.fields || ctx.request.body;
-    const user_id = ctx.params.user_id
 
     if (body.username)
         return responseError(401, "Unable change username.");
@@ -128,7 +127,7 @@ exports.updateAccount = async (ctx) => {
                 "__v": 0,
                 "password": 0
             }
-        });
+        }).exec();
         return responseSuccess("Update Success.", { ...result._doc,
             ...photoInfo,
             "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')

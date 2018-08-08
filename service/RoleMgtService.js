@@ -38,7 +38,7 @@ exports.findOneRole = async (role_id) => {
 }
 
 exports.createRole = async (body) => {
-
+    
     const require_params = ["role_name", "permission_settings"];
 
     const checkrequest = checkbody(require_params, body);
@@ -57,7 +57,7 @@ exports.createRole = async (body) => {
     };
 
     try {
-        await RoleInfo.create(newitem);
+        await RoleInfo.create(newitem).exec();
         return responseSuccess("Create success.", { ...newitem,
             "created_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
@@ -66,10 +66,10 @@ exports.createRole = async (body) => {
     }
 }
 
-exports.updateRole = async (body) => {
-    console.log('update');
-    //const body = ctx.request.body;
-    const role_id = ctx.params.role_id
+exports.updateRole = async (ctx) => {
+    //console.log('update');
+    const body = ctx.request.body.fields || ctx.request.body;
+    const role_id = ctx.params.role_id;
 
     try {
         let result = await RoleInfo.findOneAndUpdate({
@@ -80,7 +80,7 @@ exports.updateRole = async (body) => {
                 "_id": 0,
                 "__v": 0
             }
-        });
+        }).exec();
         return responseSuccess("Update Success.", { ...result._doc,
             "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });

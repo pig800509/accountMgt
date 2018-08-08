@@ -10,17 +10,24 @@ const {
 
 exports.login = async (request) => {
     const body = request.fields || request;
-    
+    const require_params = ["username", "password"];
+    const checkrequest = checkbody(require_params, body);
+    if (!checkrequest.status)
+        return responseError(401, checkrequest.status_msg);
     try {
         const password = await findOnePassword(body.username);
-        if( password === body.password){
-            return 
+        if (password === body.password) {
+            await AccountInfo.findOneAndUpdate({
+                "username": body.username
+            },{"online":true}).exec();
+            return responseSuccess("Login Success", {
+                "username": body.username,
+                "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+            });
+        } else {
+            return responseError(401, "Wrong username or password.");
         }
-        
-        const auth = await AccountInfo.findOne({
-            "username": body.username
-        });
-        
+
     } catch (e) {
         return responseError(502, e);
     }
@@ -28,20 +35,21 @@ exports.login = async (request) => {
 
 
 exports.logout = async (user_id) => {
-    
     try {
-        const auth = await AccountInfo.findOne({
-            "username": body.username
+         await AccountInfo.findOneAndUpdate({
+            "user_id": user_id
+        },{"online":false}).exec();
+
+        return responseSuccess("Logout Success", {
+            "user_id": user_id,
+            "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
-        
-            
     } catch (e) {
         return responseError(502, e);
     }
 }
 
 const findOnePassword = async (username) => {
-    //console.log('Verify user');
     try {
         let result = await AccountInfo.findOne({
             "username": username
