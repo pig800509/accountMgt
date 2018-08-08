@@ -155,19 +155,3 @@ exports.removeOneAccount = async (user_id) => {
     }
 }
 
-exports.verifyUser = async (request) => {
-    console.log('Verify user');
-    const body = request.fields || request;
-    try {
-        let result = await AccountInfo.findOne({
-            user_id: user_id
-        }, {
-            "_id": 0,
-            "__v": 0,
-            "password":0
-        }).lean().exec();
-        return result ? result : responseError(502, "Item not found");
-    } catch (e) {
-        return responseError(502, e);
-    }
-}
