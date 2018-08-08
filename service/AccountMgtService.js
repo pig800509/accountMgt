@@ -38,7 +38,7 @@ exports.findAccountByRole = async (role_id) => {
             "__v": 0,
             "password": 0
         }).lean().exec();
-        return result ? result : responseError(502, "Item not found");
+        return result ? result : responseError(404, "Item not found");
     } catch (e) {
         return responseError(502, e);
     }
@@ -54,7 +54,7 @@ exports.findOneAccount = async (user_id) => {
             "__v": 0,
             "password":0
         }).lean().exec();
-        return result ? result : responseError(502, "Item not found");
+        return result ? result : responseError(404, "Item not found");
     } catch (e) {
         return responseError(502, e);
     }
@@ -66,12 +66,12 @@ exports.createAccount = async (ctx) => {
 
     const checkrequest = checkbody(require_params, body);
     if (!checkrequest.status)
-        return responseError(502, checkrequest.status_msg);
+        return responseError(401, checkrequest.status_msg);
 
     const role = await findOneRole(body.role_id);
 
     if (!role.role_name)
-        return responseError(502, "Role not exist.");
+        return responseError(404, "Role not exist.");
 
     var newitem = {
         "user_id": IDGen.genIdInUUIDForm(),
@@ -102,7 +102,7 @@ exports.createAccount = async (ctx) => {
     } catch (e) {
         if (photoInfo.photo_filename)
             await deletePhoto(photoInfo.photo_filename);
-        return responseError(502, e);
+        return responseError(401, e);
     }
 }
 
@@ -112,7 +112,7 @@ exports.updateAccount = async (ctx) => {
     const user_id = ctx.params.user_id
 
     if (body.username)
-        return responseError(502, "Unable change username.");
+        return responseError(401, "Unable change username.");
 
     let photoInfo = null;
     try {
@@ -136,7 +136,7 @@ exports.updateAccount = async (ctx) => {
     } catch (e) {
         if (photoInfo.photo_filename)
             await deletePhoto(photoInfo.photo_filename);
-        return responseError(502, e);
+        return responseError(401, e);
     }
 }
 
@@ -145,11 +145,19 @@ exports.removeOneAccount = async (user_id) => {
         let user = {
             "user_id": user_id
         };
-        await AccountInfo.deleteOne(user).exec();
-        return responseSuccess("Delete Success", {
-            ...user,
-            "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
-        });
+        //await AccountInfo.deleteOne(user).exec();
+        const result = await AccountInfo.findOneAndRemove(user).exec();
+        if(result){
+            if (result.photo_filename)
+                await deletePhoto(result.photo_filename);
+            return responseSuccess("Delete Success", {
+                ...user,
+                "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+            });
+        }
+        else {
+            return responseError(404, "User not found.");
+        }
     } catch (e) {
         return responseError(502, e);
     }
