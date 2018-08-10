@@ -100,7 +100,7 @@ exports.createAccount = async (ctx) => {
             "created_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
-        if (photoInfo.photo_filename)
+        if (photoInfo)
             await deletePhoto(photoInfo.photo_filename);
         return responseError(401, e);
     }
@@ -133,7 +133,7 @@ exports.updateAccount = async (ctx) => {
             "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
-        if (photoInfo.photo_filename)
+        if (photoInfo)
             await deletePhoto(photoInfo.photo_filename);
         return responseError(401, e);
     }
