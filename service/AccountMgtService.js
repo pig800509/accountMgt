@@ -45,7 +45,7 @@ exports.findAccountByRole = async (role_id) => {
 }
 
 exports.findOneAccount = async (user_id) => {
-    console.log('find one');
+    //console.log('find one');
     try {
         let result = await AccountInfo.findOne({
             user_id: user_id
@@ -107,7 +107,7 @@ exports.createAccount = async (ctx) => {
 }
 
 exports.updateAccount = async (ctx) => {
-    console.log('update');
+    //console.log('update');
     const body = ctx.request.body.fields || ctx.request.body;
 
     if (body.username)

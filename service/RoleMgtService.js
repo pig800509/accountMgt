@@ -22,7 +22,7 @@ exports.listRole = async () => {
 }
 
 exports.findOneRole = async (role_id) => {
-    console.log('find one');
+    //console.log('find one');
     try {
         let result = await RoleInfo.findOne({
             role_id: role_id

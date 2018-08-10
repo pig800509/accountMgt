@@ -24,7 +24,7 @@ exports.uploadPhoto = (ctx) => new Promise(
                 })
             });
             stream.on("error", () => {
-                console.log("Upload fail.");
+                //console.log("Upload fail.");
                 reject("Upload fail.");
             });
         } catch (err) {
