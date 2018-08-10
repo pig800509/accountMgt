@@ -57,7 +57,7 @@ exports.createRole = async (body) => {
     };
 
     try {
-        await RoleInfo.create(newitem).exec();
+        await RoleInfo.create(newitem);
         return responseSuccess("Create success.", { ...newitem,
             "created_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });

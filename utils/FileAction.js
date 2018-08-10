@@ -23,7 +23,10 @@ exports.uploadPhoto = (ctx) => new Promise(
                     "photo_preview_url": ctx.host + photo_url
                 })
             });
-            stream.on("error", reject("Upload fail."));
+            stream.on("error", () => {
+                console.log("Upload fail.");
+                reject("Upload fail.");
+            });
         } catch (err) {
             console.log(err);
             reject(err);

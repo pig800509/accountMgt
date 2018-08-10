@@ -92,7 +92,7 @@ exports.createAccount = async (ctx) => {
         if (ctx.request.body.files.photo) {
             photoInfo = await uploadPhoto(ctx);
         }
-        await AccountInfo.create({...newitem,...photoInfo}).exec();
+        await AccountInfo.create({...newitem,...photoInfo});
         delete newitem.password;
         return responseSuccess("Create success.", {
             ...newitem,
