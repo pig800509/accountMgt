@@ -3,12 +3,11 @@ const path = require('path');
 const IDGen = require('./IDGenerator')
 
 const dirPath = path.join(__dirname, '../public/thumbnail');
-
-exports.uploadPhoto = (ctx) => new Promise(
+const host = "apiaccount.iotcomm.net/"
+exports.uploadPhoto = (body) => new Promise(
     (resolve, reject) => {
         console.log("photo uploading...");
         let filename = IDGen.genIdInDatetimeForm();
-        let body = ctx.request.body;
         let fullfilename = filename + '.' + body.files.photo.name.split('.').pop();
         let file = body.files.photo;
         try {
@@ -20,7 +19,7 @@ exports.uploadPhoto = (ctx) => new Promise(
                 resolve({
                     "photo_filename": fullfilename,
                     "photo_url": photo_url,
-                    "photo_preview_url": ctx.host + photo_url
+                    "photo_preview_url": host + photo_url
                 })
             });
             stream.on("error", () => {
