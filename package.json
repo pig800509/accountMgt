@@ -31,5 +31,8 @@
     "randomstring": "^1.1.5",
     "socket.io": "^2.1.1",
     "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "koa-jwt": "^3.3.2"
   }
 }

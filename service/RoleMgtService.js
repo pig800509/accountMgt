@@ -17,7 +17,7 @@ exports.listRole = async () => {
             }).lean().exec()
         };
     } catch (e) {
-        return responseError(502, e);
+        return responseError(500, e);
     }
 }
 
@@ -33,7 +33,7 @@ exports.findOneRole = async (role_id) => {
 
         return result ? result : responseError(502, "Item not found.");
     } catch (e) {
-        return responseError(502, e);
+        return responseError(500, e);
     }
 }
 
@@ -62,7 +62,7 @@ exports.createRole = async (body) => {
             "created_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
-        return responseError(502, e);
+        return responseError(500, e);
     }
 }
 
@@ -85,7 +85,7 @@ exports.updateRole = async (ctx) => {
             "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
-        return responseError(502, e);
+        return responseError(500, e);
     }
 }
 
@@ -100,6 +100,6 @@ exports.removeOneRole = async (role_id) => {
             "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
-        return responseError(502, e);
+        return responseError(500, e);
     }
 }

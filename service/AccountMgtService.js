@@ -61,12 +61,12 @@ exports.findOneAccount = async (user_id) => {
 }
 
 exports.createAccount = async (ctxbody) => {
-    const body = ctxbody.fields || ctxbody;
+    const body = ctxbody.fields || JSON.parse(ctxbody);
     const require_params = ["username", "password", "email", "phone", "role_id"];
 
     const checkrequest = checkbody(require_params, body);
     if (!checkrequest.status)
-        return responseError(401, checkrequest.status_msg);
+        return responseError(400, checkrequest.status_msg);
 
     const role = await findOneRole(body.role_id);
 
@@ -104,14 +104,13 @@ exports.createAccount = async (ctxbody) => {
     } catch (e) {
         if (photoInfo)
             await deletePhoto(photoInfo.photo_filename);
-        return responseError(401, e);
+        return responseError(500, e);
     }
 }
 // role check, user_id exist check
 exports.updateAccount = async (user_id, ctxbody) => {
     //console.log('update');
-    const body = ctxbody.fields || ctxbody;
-
+    const body = ctxbody.fields || JSON.parse(body);
     if (body.username)
         return responseError(401, "Unable change username.");
 
@@ -139,7 +138,7 @@ exports.updateAccount = async (user_id, ctxbody) => {
     } catch (e) {
         if (photoInfo)
             await deletePhoto(photoInfo.photo_filename);
-        return responseError(401, e);
+        return responseError(500, e);
     }
 }
 
@@ -150,7 +149,8 @@ exports.removeOneAccount = async (user_id) => {
         };
         //await AccountInfo.deleteOne(user).exec();
         //const result = await AccountInfo.findOneAndRemove(user).exec();
-        const userInfo = await findOneAccount(user_id);
+        const userInfo = await this.findOneAccount(user_id);
+        console.log(userInfo);
         if (userInfo.active_status == 0) {
             const result = await AccountInfo.findOneAndUpdate(user, {
                 "active_status": 4

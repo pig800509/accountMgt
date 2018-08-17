@@ -7,4 +7,4 @@ const userActionRoute = require('./router/UserActoun');
 
 router.use('/api/roles', roleRoute.routes(), roleRoute.allowedMethods());
 router.use('/api/accounts', accountRoute.routes(), accountRoute.allowedMethods());
-router.use('/accounts', userActionRoute.routes(), userActionRoute.allowedMethods());
+router.use('/api/accounts', userActionRoute.routes(), userActionRoute.allowedMethods());

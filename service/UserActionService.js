@@ -12,7 +12,8 @@ const {
 const secret = require('../config/default').tokenCert;
 
 exports.login = async (request) => {
-    const body = request.fields || request;
+    const body = request.fields || JSON.parse(request);
+    console.log(body);
     const require_params = ["username", "password"];
     const checkrequest = checkbody(require_params, body);
     if (!checkrequest.status)
