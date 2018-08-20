@@ -1,4 +1,5 @@
 node_modules/
+public/thumbnail/*
 yarn.lock
 package-lock.json
 testjwt.js

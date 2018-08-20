@@ -29,7 +29,7 @@ const accountInfoSchema = new Schema({
 
 accountInfoSchema.pre('save', function (next) {
     this.updated_time = Date.now();
-    this.display_name = this.get('display_name') || this.get('username');
+    //this.display_name = this.get('display_name') || this.get('username');
     next();
 });
 

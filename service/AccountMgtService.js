@@ -72,7 +72,13 @@ exports.createAccount = async (ctxbody) => {
 
     if (!role.role_name)
         return responseError(400, "Role not exist.");
-
+    var newitem = {
+        "user_id": IDGen.genIdInUUIDForm(),
+        "role_name": role.role_name,
+        "display_name": body.display_name?body.display_name:body.username,
+        ...body
+    }
+    /*
     var newitem = {
         "user_id": IDGen.genIdInUUIDForm(),
         "username": body.username,
@@ -87,6 +93,7 @@ exports.createAccount = async (ctxbody) => {
         "role_name": role.role_name,
         "active_status": 1
     };
+    */
     let photoInfo = null;
     try {
         if (ctxbody.files.photo) {
