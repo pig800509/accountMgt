@@ -3,7 +3,7 @@
  */
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/myDatabase', {   //accountManagement
+mongoose.connect('mongodb://localhost:27017/accountManagement', {   //accountManagement
 	useNewUrlParser: true
 });
 

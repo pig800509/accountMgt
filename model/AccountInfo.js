@@ -7,6 +7,7 @@ const accountInfoSchema = new Schema({
     "user_id": { type: String, index: { unique: true, dropDups: true } },
     "username": { type: String, required: true }, //unique: true ?
     "first_name": { type: String, default:null },
+    "last_name": { type: String, default:null },
     "display_name": { type: String },
     "description": { type: String, default:null},
     "password": { type: String, required: true},            

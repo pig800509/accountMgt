@@ -46,3 +46,11 @@ router.delete('/:user_id', async (ctx, next) => {
 	let resData = await Account.removeOneAccount(ctx.params.user_id);
 	response(ctx, resData);
 });
+
+router.put('/actions/active/:user_id', async (ctx, next) => {
+    console.log('put account active_status');
+    console.log('user_id:', ctx.params.user_id);
+	console.log('put data:', ctx.request.body);
+	let resData = await Account.activeAccount(ctx.params.user_id,ctx.request.body);
+	response(ctx, resData);
+});

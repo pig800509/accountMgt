@@ -1,7 +1,7 @@
 'use strict';
 const moment = require('moment');
 const AccountInfo = require('../model/AccountInfo');
-//const RoleInfo = require('../model/RoleInfo');
+const { findOneByUsername } = require('./AccountMgtService');
 const checkbody = require('../utils/CheckBody');
 const TokenHandler = require('../utils/TokenHandler');
 const {
@@ -10,6 +10,7 @@ const {
 } = require('../utils/Response');
 
 const secret = require('../config/default').tokenCert;
+const io = require('../sockio');
 
 exports.login = async (request) => {
     const body = request.fields || JSON.parse(request);
@@ -43,6 +44,7 @@ exports.login = async (request) => {
                 "role_name": result.role_name
             };
             const jwt = TokenHandler.sign(userToken, secret);
+            io.emitMsg("account/"+result.user_id,{"topic":"onlineStatus", "data":{"online":"1"}});
             return responseSuccess("Login Success", {
                 "user_id": result.user_id,
                 "username": body.username,
@@ -83,26 +85,12 @@ exports.logout = async (user_id) => {
         }, {
             "online": false
         }).exec();
-
+        io.emitMsg("account/"+user_id,{"topic":"onlineStatus", "data":{"online":"0"}});
         return responseSuccess("Logout Success", {
             "user_id": user_id,
             "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
         return responseError(502, e);
-    }
-}
-
-const findOneByUsername = async (username) => {
-    try {
-        let result = await AccountInfo.findOne({
-            "username": username
-        }, {
-            "_id": 0,
-            "__v": 0
-        }).lean().exec();
-        return result;
-    } catch (e) {
-        return null;
     }
 }
