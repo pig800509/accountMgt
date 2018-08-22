@@ -12,7 +12,7 @@ const accountInfoSchema = new Schema({
     "description": { type: String, default:null},
     "password": { type: String, required: true},            
     "email": { type: String, required: true },   
-    "phone": { type: String, required: true },              
+    "phone": { type: String },              
     "role_id": { type: String, required: true },
     "role_name": { type: String, required: true },
     "photo_filename": { type: String, default:null },
