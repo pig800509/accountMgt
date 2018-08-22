@@ -92,7 +92,7 @@ exports.createAccount = async (ctxbody) => {
         "root": 0,
         "active_status": 1
     }
-    console.log(newitem);
+    //console.log(newitem);
     let photoInfo = null;
     try {
         if (ctxbody.files && ctxbody.files.photo) {
@@ -119,8 +119,8 @@ exports.updateAccount = async (user_id, ctxbody) => {
     const body = ctxbody.fields || JSON.parse(body);
     if (body.username)
         return responseError(401, "Unable change username.");
-    
-    if(await this.findOneAccount(user_id).active_status != 1)
+
+    if (await this.findOneAccount(user_id).active_status != 1)
         return responseError(401, "This account has been frozen. Please contact IT.");
 
     if (body.role_id && !await findOneRole(body.role_id))
@@ -133,7 +133,7 @@ exports.updateAccount = async (user_id, ctxbody) => {
         }
         let result = await AccountInfo.findOneAndUpdate({
             "user_id": user_id,
-            
+
         }, { ...body,
             ...photoInfo
         }, {
@@ -192,15 +192,30 @@ exports.removeOneAccount = async (user_id) => {
 }
 
 exports.activeAccount = async (user_id, ctxbody) => {
-    const body = ctxbody.fields || JSON.parse(body);
-    if(!this.findOneAccount(user_id))
+    const body = ctxbody.fields || JSON.parse(ctxbody);
+    if (!await this.findOneAccount(user_id))
         return responseError(400, "User not found.");
     const require_params = ["active_status"];
     const checkrequest = checkbody(require_params, body);
     if (!checkrequest.status)
         return responseError(400, checkrequest.status_msg);
+    let check = await AccountInfo.findOne({
+        "user_id": user_id,
+        "active_status": {
+            $ne: 4
+        }
+    }, {
+        "_id": 0,
+        "__v": 0,
+        "password": 0
+    }).lean().exec();
+    if (!check)
+        return responseError(401, "User not exist.");
+        
     try {
-        await AccountInfo.findOneAndUpdate({"user_id": user_id}, {
+        await AccountInfo.findOneAndUpdate({
+            "user_id": user_id
+        }, {
             "active_status": body.active_status
         }, {
             new: true,
@@ -210,10 +225,15 @@ exports.activeAccount = async (user_id, ctxbody) => {
                 "password": 0
             }
         }).exec();
-        
-    } catch(e) {
+        return responseSuccess("Active/Inactive Success", {
+            "user_id": user_id,
+            "active_status": body.active_status,
+            "updated_time": moment().format('YYYY-MM-DD HH:mm:ss')
+        });
+    } catch (e) {
         return responseError(500, e);
     }
+
 }
 
 exports.findOneByUsername = async (username) => {

@@ -14,7 +14,7 @@ exports.uploadPhoto = (body) => new Promise(
             let reader = fileSystem.createReadStream(file.path);
             let stream = fileSystem.createWriteStream(path.join(dirPath, fullfilename));
             reader.pipe(stream);
-            const photo_url = `/thumbnail/${fullfilename}`;
+            const photo_url = `thumbnail/${fullfilename}`;
             stream.on("finish", () => {
                 resolve({
                     "photo_filename": fullfilename,
