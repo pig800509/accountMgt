@@ -18,7 +18,7 @@ const accountInfoSchema = new Schema({
     "photo_filename": { type: String, default:null },
     "photo_url": { type: String, default:null },
     "photo_preview_url": { type: String, default:null },
-    "online": { type: Boolean, default: 0 },
+    "online": { type: Number, default: 0 },
     "last_login": { type: Date, default:null},  
     "active_status": { type: Number, default: 0 },
     "retry_for_login": { type: Number, default: 0 },

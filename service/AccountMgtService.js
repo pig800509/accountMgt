@@ -105,7 +105,7 @@ exports.createAccount = async (ctxbody) => {
         return responseSuccess("Create success.", {
             ...newitem,
             ...photoInfo,
-            "created_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+            "created_time": moment().format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
         if (photoInfo)
@@ -120,8 +120,8 @@ exports.updateAccount = async (user_id, ctxbody) => {
     if (body.username)
         return responseError(401, "Unable change username.");
 
-    if (await this.findOneAccount(user_id).active_status != 1)
-        return responseError(401, "This account has been frozen. Please contact IT.");
+    if (!await findOneById(user_id))
+        return responseError(400, "User not exist.");
 
     if (body.role_id && !await findOneRole(body.role_id))
         return responseError(400, "Role not exist.");
@@ -146,7 +146,7 @@ exports.updateAccount = async (user_id, ctxbody) => {
         }).exec();
         return responseSuccess("Update Success.", { ...result._doc,
             ...photoInfo,
-            "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+            "updated_time": moment().format('YYYY-MM-DD HH:mm:ss')
         });
     } catch (e) {
         if (photoInfo)
@@ -156,14 +156,12 @@ exports.updateAccount = async (user_id, ctxbody) => {
 }
 
 exports.removeOneAccount = async (user_id) => {
+    const user = {
+        "user_id": user_id
+    };
     try {
-        let user = {
-            "user_id": user_id
-        };
-        //await AccountInfo.deleteOne(user).exec();
-        //const result = await AccountInfo.findOneAndRemove(user).exec();
         const userInfo = await this.findOneAccount(user_id);
-        //console.log(userInfo);
+
         if (userInfo.active_status == 0) {
             const result = await AccountInfo.findOneAndUpdate(user, {
                 "active_status": 4
@@ -179,7 +177,7 @@ exports.removeOneAccount = async (user_id) => {
                 await deletePhoto(result.photo_filename);
             return responseSuccess("Delete Success", {
                 ...user,
-                "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
+                "updated_time": moment().format('YYYY-MM-DD HH:mm:ss')
             });
         } else if (!userInfo.user_id) {
             return responseError(400, "User not found.");
@@ -192,31 +190,25 @@ exports.removeOneAccount = async (user_id) => {
 }
 
 exports.activeAccount = async (user_id, ctxbody) => {
-    const body = ctxbody.fields || ctxbody;
-    if (!await this.findOneAccount(user_id))
-        return responseError(400, "User not found.");
-    const require_params = ["active_status"];
-    const checkrequest = checkbody(require_params, body);
-    if (!checkrequest.status)
-        return responseError(400, checkrequest.status_msg);
-    let check = await AccountInfo.findOne({
-        "user_id": user_id,
-        "active_status": {
-            $ne: 4
-        }
-    }, {
-        "_id": 0,
-        "__v": 0,
-        "password": 0
-    }).lean().exec();
-    if (!check)
-        return responseError(401, "User not exist.");
+    let body;
+
+    //const body = ctxbody.fields || ctxbody;
+    if(typeof ctxbody ==='object')
+        body = ctxbody;
+    else if (typeof ctxbody ==='string')
+        body = JSON.parse(ctxbody);
+    else  
+        return responseError(400, "Undefined active_status");
+
+    if (!await findOneById(user_id))
+        return responseError(400, "User not exist.");
 
     try {
         await AccountInfo.findOneAndUpdate({
             "user_id": user_id
         }, {
-            "active_status": body.active_status
+            "active_status": body.active_status,
+            "retry_for_login": 0
         }, {
             new: true,
             fields: {
@@ -246,6 +238,23 @@ exports.findOneByUsername = async (username) => {
         }, {
             "_id": 0,
             "__v": 0,
+        }).lean().exec();
+        return result;
+    } catch (e) {
+        return null;
+    }
+}
+const findOneById = async (user_id) => {
+    try {
+        let result = await AccountInfo.findOne({
+            "user_id": user_id,
+            "active_status": {
+                $ne: 4
+            }
+        }, {
+            "_id": 0,
+            "__v": 0,
+            "password": 0
         }).lean().exec();
         return result;
     } catch (e) {

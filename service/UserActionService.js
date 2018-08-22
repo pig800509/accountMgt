@@ -27,7 +27,7 @@ exports.login = async (request) => {
             const result = await AccountInfo.findOneAndUpdate({
                 "username": body.username
             }, {
-                "online": true
+                "online": 1
             }, {
                 new: true,
                 fields: {
@@ -44,7 +44,7 @@ exports.login = async (request) => {
                 "role_name": result.role_name
             };
             const jwt = TokenHandler.sign(userToken, secret);
-            io.emitMsg("account/"+result.user_id,{"topic":"onlineStatus", "data":{"online":"1"}});
+            io.emitMsg("account/"+result.user_id,{"topic":"onlineStatus", "data":{"online":1}});
             return responseSuccess("Login Success", {
                 "user_id": result.user_id,
                 "username": body.username,
@@ -83,9 +83,9 @@ exports.logout = async (user_id) => {
         await AccountInfo.findOneAndUpdate({
             "user_id": user_id
         }, {
-            "online": false
+            "online": 0
         }).exec();
-        io.emitMsg("account/"+user_id,{"topic":"onlineStatus", "data":{"online":"0"}});
+        io.emitMsg("account/"+user_id,{"topic":"onlineStatus", "data":{"online":0}});
         return responseSuccess("Logout Success", {
             "user_id": user_id,
             "updated_time": moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')

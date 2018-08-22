@@ -1,6 +1,10 @@
 node_modules/
 public/thumbnail/*
+
+.sonarlint/
+
 yarn.lock
 package-lock.json
 testjwt.js
 test.js
+ 
