@@ -192,7 +192,7 @@ exports.removeOneAccount = async (user_id) => {
 }
 
 exports.activeAccount = async (user_id, ctxbody) => {
-    const body = ctxbody.fields || JSON.parse(ctxbody);
+    const body = ctxbody.fields || ctxbody;
     if (!await this.findOneAccount(user_id))
         return responseError(400, "User not found.");
     const require_params = ["active_status"];
