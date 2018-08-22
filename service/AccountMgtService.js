@@ -69,7 +69,7 @@ exports.findOneAccount = async (user_id) => {
 
 exports.createAccount = async (ctxbody) => {
     const body = ctxbody.fields || JSON.parse(ctxbody);
-    const require_params = ["username", "password", "email", "phone", "role_id"];
+    const require_params = ["username", "password", "email", "role_id"];
 
     const checkrequest = checkbody(require_params, body);
     if (!checkrequest.status)
@@ -211,7 +211,7 @@ exports.activeAccount = async (user_id, ctxbody) => {
     }).lean().exec();
     if (!check)
         return responseError(401, "User not exist.");
-        
+
     try {
         await AccountInfo.findOneAndUpdate({
             "user_id": user_id
