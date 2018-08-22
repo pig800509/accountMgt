@@ -76,7 +76,8 @@ exports.createAccount = async (ctxbody) => {
         return responseError(400, checkrequest.status_msg);
 
     let role = await findOneRole(body.role_id);
-    if (!role)
+    //console.log(role);
+    if (!role.role_name)
         return responseError(400, "Role not exist.");
 
     if (await this.findOneByUsername(body.username)) {
@@ -91,10 +92,10 @@ exports.createAccount = async (ctxbody) => {
         "root": 0,
         "active_status": 1
     }
-
+    console.log(newitem);
     let photoInfo = null;
     try {
-        if (ctxbody.files.photo) {
+        if (ctxbody.files && ctxbody.files.photo) {
             photoInfo = await uploadPhoto(ctxbody);
         }
         await AccountInfo.create({ ...newitem,
@@ -127,7 +128,7 @@ exports.updateAccount = async (user_id, ctxbody) => {
 
     let photoInfo = null;
     try {
-        if (ctxbody.files.photo) {
+        if (ctxbody.files && ctxbody.files.photo) {
             photoInfo = await uploadPhoto(ctxbody);
         }
         let result = await AccountInfo.findOneAndUpdate({
