@@ -78,7 +78,7 @@ exports.createAccount = async (ctxbody) => {
     if (!await findOneRole(body.role_id))
         return responseError(400, "Role not exist.");
 
-    if (!await this.findOneByUsername(body.username)) {
+    if (await this.findOneByUsername(body.username)) {
         return responseError(400, "username duplicate.");
     }
 
