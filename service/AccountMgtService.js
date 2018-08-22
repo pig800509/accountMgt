@@ -75,7 +75,8 @@ exports.createAccount = async (ctxbody) => {
     if (!checkrequest.status)
         return responseError(400, checkrequest.status_msg);
 
-    if (!await findOneRole(body.role_id))
+    let role = await findOneRole(body.role_id);
+    if (!role)
         return responseError(400, "Role not exist.");
 
     if (await this.findOneByUsername(body.username)) {
